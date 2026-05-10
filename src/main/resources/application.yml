@@ -3,9 +3,9 @@ spring:
     time-zone: ${APP_TIME_ZONE:America/Chicago}
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:sqlserver://localhost:1433;databaseName=transactionsdb;encrypt=true;trustServerCertificate=true}
-    username: ${SPRING_DATASOURCE_USERNAME:sa}
-    password: ${SPRING_DATASOURCE_PASSWORD:StrongPass123!}
+    url: ${SPRING_DATASOURCE_URL:jdbc:sqlserver://${DB_HOST:localhost}:${DB_PORT:1433};databaseName=${DB_NAME:transactionsdb};encrypt=true;trustServerCertificate=true}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:sa}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   jpa:
@@ -20,7 +20,7 @@ spring:
           time_zone: ${APP_TIME_ZONE:America/Chicago}
 
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
@@ -37,8 +37,13 @@ spring:
       missing-topics-fatal: false
 
 jwt:
-  secret: ${JWT_SECRET:your-super-secure-development-secret-key-change-this}
+  secret: ${JWT_SECRET:}
   expiration: ${JWT_EXPIRATION:3600000}
+
+app:
+  config:
+    validation:
+      enabled: ${CONFIG_VALIDATION_ENABLED:false}
 
 logging:
   pattern:

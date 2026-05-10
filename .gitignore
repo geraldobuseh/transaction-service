@@ -36,6 +36,18 @@ out/
 ### VS Code ###
 .vscode/
 
+### Environment and secrets ###
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.local.env
+*.production.env
+*.secret
+*.secrets
+secrets/
+local-secrets/
+
 ### Frontend ###
 frontend/node_modules/
 frontend/dist/

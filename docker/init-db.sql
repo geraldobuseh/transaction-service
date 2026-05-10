@@ -1,5 +1,6 @@
-IF DB_ID('transactionsdb') IS NULL
+IF DB_ID(N'$(DB_NAME)') IS NULL
 BEGIN
-    CREATE DATABASE transactionsdb;
+    DECLARE @sql nvarchar(max) = N'CREATE DATABASE ' + QUOTENAME(N'$(DB_NAME)');
+    EXEC(@sql);
 END
 GO

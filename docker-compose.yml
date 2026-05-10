@@ -4,10 +4,10 @@ services:
     container_name: transaction-sqlserver
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "StrongPass123!"
-      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: "${DB_PASSWORD:?DB_PASSWORD is required}"
+      MSSQL_PID: "${MSSQL_PID:-Developer}"
     ports:
-      - "1433:1433"
+      - "${DB_PORT:-1433}:1433"
     volumes:
       - transaction-sqlserver-data:/var/opt/mssql
     restart: unless-stopped
@@ -28,9 +28,8 @@ services:
       sqlserver:
         condition: service_healthy
     environment:
-      MSSQL_SA_PASSWORD: "StrongPass123!"
-    volumes:
-      - ./docker/init-db.sql:/init-db.sql:ro
+      MSSQL_SA_PASSWORD: "${DB_PASSWORD:?DB_PASSWORD is required}"
+      DB_NAME: "${DB_NAME:?DB_NAME is required}"
     entrypoint:
       - bash
       - -c
@@ -38,7 +37,7 @@ services:
       - |
         SQLCMD=/opt/mssql-tools18/bin/sqlcmd
         [ -x "$$SQLCMD" ] || SQLCMD=/opt/mssql-tools/bin/sqlcmd
-        "$$SQLCMD" -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -i /init-db.sql
+        "$$SQLCMD" -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -C -Q "IF DB_ID(N'$$DB_NAME') IS NULL BEGIN DECLARE @sql nvarchar(max) = N'CREATE DATABASE ' + QUOTENAME(N'$$DB_NAME'); EXEC(@sql); END"
     restart: "no"
 
   kafka:
@@ -49,7 +48,7 @@ services:
       KAFKA_PROCESS_ROLES: "broker,controller"
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
       KAFKA_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092,EXTERNAL://localhost:${KAFKA_EXTERNAL_PORT:-9094}"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT"
       KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
       KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
@@ -57,7 +56,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: "1"
     ports:
-      - "9094:9094"
+      - "${KAFKA_EXTERNAL_PORT:-9094}:9094"
     volumes:
       - transaction-kafka-data:/var/lib/kafka/data
     restart: unless-stopped
@@ -79,12 +78,15 @@ services:
       kafka:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=transactionsdb;encrypt=true;trustServerCertificate=true"
-      SPRING_DATASOURCE_USERNAME: "sa"
-      SPRING_DATASOURCE_PASSWORD: "StrongPass123!"
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
-      APP_TIME_ZONE: "America/Chicago"
-      TZ: "America/Chicago"
+      SPRING_DATASOURCE_URL: "jdbc:sqlserver://${DB_HOST_DOCKER:-sqlserver}:1433;databaseName=${DB_NAME:?DB_NAME is required};encrypt=true;trustServerCertificate=true"
+      SPRING_DATASOURCE_USERNAME: "${DB_USERNAME:?DB_USERNAME is required}"
+      SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD:?DB_PASSWORD is required}"
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: "${KAFKA_INTERNAL_BOOTSTRAP_SERVERS:-kafka:9092}"
+      JWT_SECRET: "${JWT_SECRET:?JWT_SECRET is required}"
+      JWT_EXPIRATION: "${JWT_EXPIRATION:-3600000}"
+      CONFIG_VALIDATION_ENABLED: "${CONFIG_VALIDATION_ENABLED:-true}"
+      APP_TIME_ZONE: "${APP_TIME_ZONE:-America/Chicago}"
+      TZ: "${APP_TIME_ZONE:-America/Chicago}"
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -96,7 +98,8 @@ services:
     depends_on:
       - app
     environment:
-      VITE_BACKEND_PROXY_TARGET: "http://app:8080"
+      VITE_API_BASE_URL: "${VITE_API_BASE_URL:-}"
+      VITE_BACKEND_PROXY_TARGET: "${VITE_BACKEND_PROXY_TARGET_DOCKER:-http://app:8080}"
     volumes:
       - ./frontend:/app
       - transaction-frontend-node-modules:/app/node_modules
