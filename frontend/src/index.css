@@ -1,0 +1,206 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --scrollbar-track: #000;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.28);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.46);
+}
+
+:root[data-background-mode='white'] {
+  color-scheme: light;
+  --scrollbar-track: #f7f7f4;
+  --scrollbar-thumb: rgba(0, 0, 0, 0.28);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.46);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: #000;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.24);
+  color: white;
+}
+
+@layer components {
+  .glass-panel {
+    @apply rounded-[1.75rem] border border-white/10 bg-black/70 shadow-glass backdrop-blur-2xl;
+  }
+
+  .field-label {
+    @apply mb-2 block text-xs font-semibold text-white/75;
+  }
+
+  .form-input {
+    @apply w-full rounded-2xl border border-white/10 bg-black/70 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-white/45 focus:bg-black/85 focus:ring-4 focus:ring-white/10;
+  }
+
+  .field-error {
+    @apply mt-2 text-xs text-white;
+  }
+}
+
+.theme-white .glass-panel {
+  background: rgba(0, 0, 0, 0.78);
+  border-color: rgba(0, 0, 0, 0.18);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+}
+
+.theme-white .metric-card {
+  background: rgba(0, 0, 0, 0.82);
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
+}
+
+.theme-white header,
+.theme-white .hero-copy {
+  border-color: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.62);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(24px);
+}
+
+.theme-white header {
+  margin-top: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 2rem;
+}
+
+.theme-white .hero-copy {
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2rem;
+}
+
+.theme-white .money-bill {
+  border-color: rgba(0, 0, 0, 0.2);
+  background:
+    linear-gradient(135deg, rgba(0, 0, 0, 0.12), rgba(250, 250, 250, 0.52)),
+    rgba(255, 255, 255, 0.24);
+  color: rgba(0, 0, 0, 0.66);
+}
+
+.money-bill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 9.5rem;
+  height: 4.75rem;
+  padding: 0.8rem 1rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.035)),
+    rgba(255, 255, 255, 0.035);
+  color: rgba(255, 255, 255, 0.32);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow: 0 24px 90px rgba(255, 255, 255, 0.08);
+  animation: money-float 12s ease-in-out infinite;
+}
+
+.money-bill::before,
+.money-bill::after {
+  content: '';
+  position: absolute;
+  inset: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.65rem;
+}
+
+.finance-orbit {
+  position: absolute;
+  width: 18rem;
+  height: 18rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  box-shadow:
+    inset 0 0 60px rgba(255, 255, 255, 0.04),
+    0 0 80px rgba(255, 255, 255, 0.08);
+  animation: finance-spin 28s linear infinite;
+}
+
+.finance-orbit::before {
+  content: '$';
+  position: absolute;
+  top: -0.75rem;
+  left: 50%;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.55);
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 800;
+}
+
+@keyframes money-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--tw-rotate));
+  }
+  50% {
+    transform: translate3d(0, -18px, 0) rotate(var(--tw-rotate));
+  }
+}
+
+@keyframes finance-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}

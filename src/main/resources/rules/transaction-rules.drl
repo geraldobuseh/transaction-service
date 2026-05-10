@@ -1,0 +1,47 @@
+package rules;
+
+import com.geraldobuseh.transactionservice.entity.Transaction;
+import com.geraldobuseh.transactionservice.entity.TransactionStatus;
+import com.geraldobuseh.transactionservice.entity.TransactionType;
+
+rule "Flag high value transaction without type"
+when
+    $transaction : Transaction(type == null, amount.compareTo(new java.math.BigDecimal("10000")) > 0)
+then
+    $transaction.setStatus(TransactionStatus.FLAGGED);
+end
+
+rule "Approve normal transaction without type"
+when
+    $transaction : Transaction(type == null, amount.compareTo(new java.math.BigDecimal("10000")) <= 0)
+then
+    $transaction.setStatus(TransactionStatus.APPROVED);
+end
+
+rule "Flag medium debit transaction"
+when
+    $transaction : Transaction(type == TransactionType.DEBIT, amount.compareTo(new java.math.BigDecimal("5000")) > 0)
+then
+    $transaction.setStatus(TransactionStatus.FLAGGED);
+end
+
+rule "Approve standard debit transaction"
+when
+    $transaction : Transaction(type == TransactionType.DEBIT, amount.compareTo(new java.math.BigDecimal("5000")) <= 0)
+then
+    $transaction.setStatus(TransactionStatus.APPROVED);
+end
+
+rule "Approve standard credit transaction"
+when
+    $transaction : Transaction(type == TransactionType.CREDIT, amount.compareTo(new java.math.BigDecimal("20000")) <= 0)
+then
+    $transaction.setStatus(TransactionStatus.APPROVED);
+end
+
+rule "Flag very high credit transaction"
+when
+    $transaction : Transaction(type == TransactionType.CREDIT, amount.compareTo(new java.math.BigDecimal("20000")) > 0)
+then
+    $transaction.setStatus(TransactionStatus.FLAGGED);
+end
