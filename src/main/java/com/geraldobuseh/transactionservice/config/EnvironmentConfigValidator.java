@@ -16,6 +16,7 @@ public class EnvironmentConfigValidator implements ApplicationRunner {
     private final String jwtSecret;
     private final String datasourcePassword;
     private final String datasourceUsername;
+    private final String datasourceUrl;
     private final String kafkaBootstrapServers;
 
     public EnvironmentConfigValidator(
@@ -23,12 +24,14 @@ public class EnvironmentConfigValidator implements ApplicationRunner {
             @Value("${jwt.secret:}") String jwtSecret,
             @Value("${spring.datasource.password:}") String datasourcePassword,
             @Value("${spring.datasource.username:}") String datasourceUsername,
+            @Value("${spring.datasource.url:}") String datasourceUrl,
             @Value("${spring.kafka.bootstrap-servers:}") String kafkaBootstrapServers
     ) {
         this.validationEnabled = validationEnabled;
         this.jwtSecret = jwtSecret;
         this.datasourcePassword = datasourcePassword;
         this.datasourceUsername = datasourceUsername;
+        this.datasourceUrl = datasourceUrl;
         this.kafkaBootstrapServers = kafkaBootstrapServers;
     }
 
@@ -40,6 +43,7 @@ public class EnvironmentConfigValidator implements ApplicationRunner {
 
         List<String> missingValues = new ArrayList<>();
         requireText("JWT_SECRET", jwtSecret, missingValues);
+        requireText("SPRING_DATASOURCE_URL", datasourceUrl, missingValues);
         requireText("DB_USERNAME or SPRING_DATASOURCE_USERNAME", datasourceUsername, missingValues);
         requireText("DB_PASSWORD or SPRING_DATASOURCE_PASSWORD", datasourcePassword, missingValues);
         requireText("KAFKA_BOOTSTRAP_SERVERS or SPRING_KAFKA_BOOTSTRAP_SERVERS", kafkaBootstrapServers, missingValues);
