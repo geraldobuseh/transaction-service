@@ -3,19 +3,18 @@ spring:
     time-zone: ${APP_TIME_ZONE:America/Chicago}
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:sqlserver://${DB_HOST:localhost}:${DB_PORT:1433};databaseName=${DB_NAME:transactionsdb};encrypt=true;trustServerCertificate=true}
-    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:sa}}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:transactionsdb}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DB_USERNAME:postgres}}
     password: ${SPRING_DATASOURCE_PASSWORD:${DB_PASSWORD:}}
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   jpa:
+    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
     properties:
       hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.SQLServerDialect
+        format_sql: ${SPRING_JPA_FORMAT_SQL:false}
         jdbc:
           time_zone: ${APP_TIME_ZONE:America/Chicago}
 
@@ -46,5 +45,8 @@ app:
       enabled: ${CONFIG_VALIDATION_ENABLED:false}
 
 logging:
+  level:
+    org.hibernate.SQL: ${LOGGING_LEVEL_ORG_HIBERNATE_SQL:WARN}
+    org.hibernate.orm.jdbc.bind: ${LOGGING_LEVEL_ORG_HIBERNATE_ORM_JDBC_BIND:WARN}
   pattern:
     console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} level=%5p correlationId=%X{correlationId:-none} username=%X{username:-anonymous} thread=%t logger=%logger{36} message=%m%n"
